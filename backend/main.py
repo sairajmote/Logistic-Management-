@@ -1,3 +1,5 @@
+import os
+from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import psycopg2
@@ -5,13 +7,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from passlib.context import CryptContext
 from jose import jwt
 from fastapi import Depends
+load_dotenv()
 from fastapi.security import HTTPBearer
-SECRET_KEY = "commodity-management-secret-0987"
+SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
 pwd_context = CryptContext(
     schemes=["bcrypt"],
         deprecated="auto"     
 )   
+
 
 # =========================================================
 # MODELS
@@ -110,11 +114,7 @@ def require_admin_or_supplier(
 
 def get_db_connection():
     conn = psycopg2.connect(
-        host="localhost",
-        database="commodity_management",
-        user="postgres",
-        password="0987",
-        port="5432"
+        os.getenv("DATABASE_URL")
     )
     return conn
 
