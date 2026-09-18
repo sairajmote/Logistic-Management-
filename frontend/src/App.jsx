@@ -8,6 +8,7 @@ console.log("API URL:", API_URL);
 function App() {
   const [shipments, setShipments] = useState([]);
   const [showform, setShowform] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const [newshipment, setNewshipment] = useState({
     product_id: "",
@@ -168,7 +169,23 @@ function App() {
     if (activeSection !== "shipments") {
       setShowform(false);
     }
+    setMenuOpen(false);
   }, [activeSection]);
+
+  useEffect(() => {
+    function handleResize() {
+      if (window.innerWidth > 768) {
+        setMenuOpen(false);
+      }
+    }
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  function handleNavigate(section) {
+    setActiveSection(section);
+    setMenuOpen(false);
+  }
 
   useEffect(() => {
     setCurrentPage(1);
@@ -562,30 +579,32 @@ function App() {
 
   if (!token) {
     return (
-      <form onSubmit={handleLogin} className="login-form">
-        <h2>Commodity Management System</h2>
-        <i>"User Name": Demo Admin <br />
-           "Password": Demo@123
-        </i>
-        <p >Sign in to your account</p>
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUserName(e.target.value)}
-        />
+      <div className="login-wrapper">
+        <form onSubmit={handleLogin} className="login-form">
+          <h2>Commodity Management System</h2>
+          <i>"User Name": Demo Admin <br />
+             "Password": Demo@123
+          </i>
+          <p>Sign in to your account</p>
+          <input
+            type="text"
+            placeholder="Username"
+            value={username}
+            onChange={(e) => setUserName(e.target.value)}
+          />
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
 
-        <button type="submit">
-          Login
-        </button>
-      </form>
+          <button type="submit">
+            Login
+          </button>
+        </form>
+      </div>
     );
   }
 
@@ -593,54 +612,88 @@ function App() {
     <div className="app">
 
       <div className="navbar">
+        <div
+          className="nav-brand"
+          onClick={() => handleNavigate("dashboard")}
+        >
+          <span className="brand-dot"></span>
+          Commodity System
+        </div>
 
         <button
-          onClick={() => setActiveSection("dashboard")}
+          type="button"
+          className={`hamburger-btn ${menuOpen ? "open" : ""}`}
+          onClick={() => setMenuOpen((prev) => !prev)}
+          aria-label="Toggle navigation"
+          aria-expanded={menuOpen}
         >
-          Dashboard
+          <span className="hamburger-bar"></span>
+          <span className="hamburger-bar"></span>
+          <span className="hamburger-bar"></span>
         </button>
 
-        <button
-          onClick={() => setActiveSection("shipments")}
-        >
-          Shipments
-        </button>
-
-        <button
-          onClick={() => setActiveSection("products")}
-        >
-          Products
-        </button>
-
-        {role !== "supplier" && (
+        <div className={`nav-links ${menuOpen ? "open" : ""}`}>
           <button
-            onClick={() => setActiveSection("suppliers")}
+            className={activeSection === "dashboard" ? "active" : ""}
+            onClick={() => handleNavigate("dashboard")}
           >
-            Supplier
+            Dashboard
           </button>
-        )}
 
-        {role === "admin" && (
           <button
-            onClick={() => setActiveSection("users")}
+            className={activeSection === "shipments" ? "active" : ""}
+            onClick={() => handleNavigate("shipments")}
           >
-            Users
+            Shipments
           </button>
-        )}
 
-        <button
-          onClick={() => {
-            localStorage.removeItem("token");
-            setToken(null);
-          }}
-        >
-          Log Out
-        </button>
+          <button
+            className={activeSection === "products" ? "active" : ""}
+            onClick={() => handleNavigate("products")}
+          >
+            Products
+          </button>
 
+          {role !== "supplier" && (
+            <button
+              className={activeSection === "suppliers" ? "active" : ""}
+              onClick={() => handleNavigate("suppliers")}
+            >
+              Supplier
+            </button>
+          )}
+
+          {role === "admin" && (
+            <button
+              className={activeSection === "users" ? "active" : ""}
+              onClick={() => handleNavigate("users")}
+            >
+              Users
+            </button>
+          )}
+
+          <button
+            className="logout-nav-btn"
+            onClick={() => {
+              setMenuOpen(false);
+              localStorage.removeItem("token");
+              setToken(null);
+            }}
+          >
+            Log Out
+          </button>
+        </div>
       </div>
 
+      {menuOpen && (
+        <div
+          className="mobile-backdrop"
+          onClick={() => setMenuOpen(false)}
+        />
+      )}
+
       <h1>
-        Commmodity Manaegment System
+        Commodity Management System
       </h1>
 
       {showform && (
@@ -772,30 +825,32 @@ function App() {
               </select>
             </div>
 
-            <button type="submit">
-              {editId
-                ? "Update Shipment"
-                : "Create Shipment"}
-            </button>
+            <div className="form-actions">
+              <button type="submit">
+                {editId
+                  ? "Update Shipment"
+                  : "Create Shipment"}
+              </button>
 
-            <button
-              type="button"
-              onClick={() => {
-                setShowform(false);
-                setEditId(null);
+              <button
+                type="button"
+                onClick={() => {
+                  setShowform(false);
+                  setEditId(null);
 
-                setNewshipment({
-                  product_id: "",
-                  supplier_id: "",
-                  quantity: "",
-                  origin: "",
-                  destination: "",
-                  status: ""
-                });
-              }}
-            >
-              Cancel
-            </button>
+                  setNewshipment({
+                    product_id: "",
+                    supplier_id: "",
+                    quantity: "",
+                    origin: "",
+                    destination: "",
+                    status: ""
+                  });
+                }}
+              >
+                Cancel
+              </button>
+            </div>
 
           </form>
         </>
@@ -1020,30 +1075,30 @@ function App() {
                   {shipment.status}
                 </p>
 
-                {(role === "admin" ||
-                  role === "supplier") && (
+                <div className="card-actions">
+                  {(role === "admin" ||
+                    role === "supplier") && (
+                      <button
+                        onClick={() =>
+                          handleEdit(shipment)
+                        }
+                      >
+                        {role === "admin"
+                          ? "Edit"
+                          : "Update Status"}
+                      </button>
+                    )}
+
+                  {role === "admin" && (
                     <button
                       onClick={() =>
-                        handleEdit(shipment)
+                        handleDelete(shipment.id)
                       }
                     >
-                      {role === "admin"
-                        ? "Edit"
-                        : "Update Status"}
+                      Delete
                     </button>
                   )}
-
-                {role === "admin" && (
-                  <button
-                    onClick={() =>
-                      handleDelete(shipment.id)
-                    }
-                  >
-                    Delete
-                  </button>
-                )}
-
-                <br />
+                </div>
 
               </div>
             ))}
@@ -1098,7 +1153,7 @@ function App() {
           )}
 
           {showProductForm && (
-            <div>
+            <div className="form-card inline-form">
 
               <input
                 placeholder="Product Name"
@@ -1108,55 +1163,60 @@ function App() {
                 }
               />
 
-              {role === "admin" && (
-                <button
-                  onClick={handleAddProduct}
-                >
-                  {editProductId
-                    ? "Update"
-                    : "Add"}
-                </button>
-              )}
+              <div className="form-actions">
+                {role === "admin" && (
+                  <button
+                    onClick={handleAddProduct}
+                  >
+                    {editProductId
+                      ? "Update"
+                      : "Add"}
+                  </button>
+                )}
 
-              <button
-                onClick={() => {
-                  setShowProductForm(false);
-                  setEditProductId(null);
-                  setNewProduct("");
-                }}
-              >
-                Cancel
-              </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowProductForm(false);
+                    setEditProductId(null);
+                    setNewProduct("");
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
 
             </div>
           )}
 
           {products.map((product) => (
-            <div key={product.id}>
+            <div key={product.id} className="product-card">
 
               <p>
                 {product.name}
               </p>
 
-              {role === "admin" && (
-                <button
-                  onClick={() =>
-                    handleEditProduct(product)
-                  }
-                >
-                  Edit
-                </button>
-              )}
+              <div className="card-actions">
+                {role === "admin" && (
+                  <button
+                    onClick={() =>
+                      handleEditProduct(product)
+                    }
+                  >
+                    Edit
+                  </button>
+                )}
 
-              {role === "admin" && (
-                <button
-                  onClick={() =>
-                    handleDeleteProduct(product.id)
-                  }
-                >
-                  Delete
-                </button>
-              )}
+                {role === "admin" && (
+                  <button
+                    onClick={() =>
+                      handleDeleteProduct(product.id)
+                    }
+                  >
+                    Delete
+                  </button>
+                )}
+              </div>
 
             </div>
           ))}
@@ -1182,7 +1242,7 @@ function App() {
           )}
 
           {showSupplierForm && (
-            <div>
+            <div className="form-card inline-form">
 
               <input
                 placeholder="Supplier Name"
@@ -1206,33 +1266,36 @@ function App() {
                 }
               />
 
-              <button
-                onClick={handleAddSupplier}
-              >
-                {editSupplierId
-                  ? "Update"
-                  : "Add"}
-              </button>
+              <div className="form-actions">
+                <button
+                  onClick={handleAddSupplier}
+                >
+                  {editSupplierId
+                    ? "Update"
+                    : "Add"}
+                </button>
 
-              <button
-                onClick={() => {
-                  setShowSupplierForm(false);
-                  setEditSupplierId(null);
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowSupplierForm(false);
+                    setEditSupplierId(null);
 
-                  setNewSupplier({
-                    name: "",
-                    country: ""
-                  });
-                }}
-              >
-                Cancel
-              </button>
+                    setNewSupplier({
+                      name: "",
+                      country: ""
+                    });
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
 
             </div>
           )}
 
           {suppliers.map((supplier) => (
-            <div key={supplier.id}>
+            <div key={supplier.id} className="supplier-card">
 
               <p>
                 Name: {supplier.name}
@@ -1242,27 +1305,29 @@ function App() {
                 Country: {supplier.country}
               </p>
 
-              {role === "admin" && (
-                <button
-                  onClick={() =>
-                    handleEditSupplier(supplier)
-                  }
-                >
-                  Edit
-                </button>
-              )}
+              <div className="card-actions">
+                {role === "admin" && (
+                  <button
+                    onClick={() =>
+                      handleEditSupplier(supplier)
+                    }
+                  >
+                    Edit
+                  </button>
+                )}
 
-              {role === "admin" && (
-                <button
-                  onClick={() =>
-                    handleDeleteSupplier(
-                      supplier.id
-                    )
-                  }
-                >
-                  Delete
-                </button>
-              )}
+                {role === "admin" && (
+                  <button
+                    onClick={() =>
+                      handleDeleteSupplier(
+                        supplier.id
+                      )
+                    }
+                  >
+                    Delete
+                  </button>
+                )}
+              </div>
 
             </div>
           ))}
