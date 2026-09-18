@@ -1,14 +1,69 @@
 import { useEffect, useState } from "react";
 import "./App.css";
+import loginHero from "./assets/login-hero.jpg";
+import loginHeroDark from "./assets/login-hero-dark.jpg";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 console.log("API URL:", API_URL);
 
+function ThemeToggle({ darkMode, setDarkMode, className = "" }) {
+  return (
+    <button
+      type="button"
+      className={`theme-toggle-btn ${className}`}
+      onClick={() => setDarkMode((prev) => !prev)}
+      aria-label="Toggle dark mode"
+      title={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+    >
+      {darkMode ? (
+        <svg
+          className="theme-icon"
+          width="17"
+          height="17"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <circle cx="12" cy="12" r="4" />
+          <path d="M12 2v2" />
+          <path d="M12 20v2" />
+          <path d="m4.93 4.93 1.41 1.41" />
+          <path d="m17.66 17.66 1.41 1.41" />
+          <path d="M2 12h2" />
+          <path d="M20 12h2" />
+          <path d="m6.34 17.66-1.41 1.41" />
+          <path d="m19.07 4.93-1.41 1.41" />
+        </svg>
+      ) : (
+        <svg
+          className="theme-icon"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+        </svg>
+      )}
+    </button>
+  );
+}
+
 function App() {
   const [shipments, setShipments] = useState([]);
   const [showform, setShowform] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [darkMode, setDarkMode] = useState(
+    localStorage.getItem("theme") === "dark"
+  );
 
   const [newshipment, setNewshipment] = useState({
     product_id: "",
@@ -186,6 +241,14 @@ function App() {
     setActiveSection(section);
     setMenuOpen(false);
   }
+
+  useEffect(() => {
+    document.documentElement.setAttribute(
+      "data-theme",
+      darkMode ? "dark" : "light"
+    );
+    localStorage.setItem("theme", darkMode ? "dark" : "light");
+  }, [darkMode]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -580,30 +643,50 @@ function App() {
   if (!token) {
     return (
       <div className="login-wrapper">
-        <form onSubmit={handleLogin} className="login-form">
-          <h2>Commodity Management System</h2>
-          <i>"User Name": Demo Admin <br />
-             "Password": Demo@123
-          </i>
-          <p>Sign in to your account</p>
-          <input
-            type="text"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUserName(e.target.value)}
-          />
+        <ThemeToggle
+          darkMode={darkMode}
+          setDarkMode={setDarkMode}
+          className="login-theme-toggle"
+        />
 
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+        <div className="login-card">
+          <div className="login-card-left">
+            <img
+              src={darkMode ? loginHeroDark : loginHero}
+              alt="Commodity Logistics Hub"
+              className="login-card-img"
+            />
+          </div>
 
-          <button type="submit">
-            Login
-          </button>
-        </form>
+          <div className="login-card-divider"></div>
+
+          <div className="login-card-right">
+            <form onSubmit={handleLogin} className="login-form">
+              <h2>Commodity Management System</h2>
+              <i>"User Name": Demo Admin <br />
+                 "Password": Demo@123
+              </i>
+              <p>Sign in to your account</p>
+              <input
+                type="text"
+                placeholder="Username"
+                value={username}
+                onChange={(e) => setUserName(e.target.value)}
+              />
+
+              <input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+
+              <button type="submit">
+                Login
+              </button>
+            </form>
+          </div>
+        </div>
       </div>
     );
   }
@@ -620,68 +703,72 @@ function App() {
           Commodity System
         </div>
 
-        <button
-          type="button"
-          className={`hamburger-btn ${menuOpen ? "open" : ""}`}
-          onClick={() => setMenuOpen((prev) => !prev)}
-          aria-label="Toggle navigation"
-          aria-expanded={menuOpen}
-        >
-          <span className="hamburger-bar"></span>
-          <span className="hamburger-bar"></span>
-          <span className="hamburger-bar"></span>
-        </button>
-
-        <div className={`nav-links ${menuOpen ? "open" : ""}`}>
-          <button
-            className={activeSection === "dashboard" ? "active" : ""}
-            onClick={() => handleNavigate("dashboard")}
-          >
-            Dashboard
-          </button>
+        <div className="navbar-actions">
+          <ThemeToggle darkMode={darkMode} setDarkMode={setDarkMode} />
 
           <button
-            className={activeSection === "shipments" ? "active" : ""}
-            onClick={() => handleNavigate("shipments")}
+            type="button"
+            className={`hamburger-btn ${menuOpen ? "open" : ""}`}
+            onClick={() => setMenuOpen((prev) => !prev)}
+            aria-label="Toggle navigation"
+            aria-expanded={menuOpen}
           >
-            Shipments
+            <span className="hamburger-bar"></span>
+            <span className="hamburger-bar"></span>
+            <span className="hamburger-bar"></span>
           </button>
 
-          <button
-            className={activeSection === "products" ? "active" : ""}
-            onClick={() => handleNavigate("products")}
-          >
-            Products
-          </button>
-
-          {role !== "supplier" && (
+          <div className={`nav-links ${menuOpen ? "open" : ""}`}>
             <button
-              className={activeSection === "suppliers" ? "active" : ""}
-              onClick={() => handleNavigate("suppliers")}
+              className={activeSection === "dashboard" ? "active" : ""}
+              onClick={() => handleNavigate("dashboard")}
             >
-              Supplier
+              Dashboard
             </button>
-          )}
 
-          {role === "admin" && (
             <button
-              className={activeSection === "users" ? "active" : ""}
-              onClick={() => handleNavigate("users")}
+              className={activeSection === "shipments" ? "active" : ""}
+              onClick={() => handleNavigate("shipments")}
             >
-              Users
+              Shipments
             </button>
-          )}
 
-          <button
-            className="logout-nav-btn"
-            onClick={() => {
-              setMenuOpen(false);
-              localStorage.removeItem("token");
-              setToken(null);
-            }}
-          >
-            Log Out
-          </button>
+            <button
+              className={activeSection === "products" ? "active" : ""}
+              onClick={() => handleNavigate("products")}
+            >
+              Products
+            </button>
+
+            {role !== "supplier" && (
+              <button
+                className={activeSection === "suppliers" ? "active" : ""}
+                onClick={() => handleNavigate("suppliers")}
+              >
+                Supplier
+              </button>
+            )}
+
+            {role === "admin" && (
+              <button
+                className={activeSection === "users" ? "active" : ""}
+                onClick={() => handleNavigate("users")}
+              >
+                Users
+              </button>
+            )}
+
+            <button
+              className="logout-nav-btn"
+              onClick={() => {
+                setMenuOpen(false);
+                localStorage.removeItem("token");
+                setToken(null);
+              }}
+            >
+              Log Out
+            </button>
+          </div>
         </div>
       </div>
 

@@ -129,7 +129,6 @@ print("Database connection function ready")
 app = FastAPI()
 
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
-print("FRONTEND_URL:", FRONTEND_URL)
 
 app.add_middleware(
     CORSMiddleware,
@@ -141,8 +140,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
 # =========================================================
 # HOME
 # =========================================================

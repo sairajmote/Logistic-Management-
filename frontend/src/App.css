@@ -92,6 +92,61 @@ button {
   box-shadow: 0 0 0 3px rgba(79, 124, 255, 0.2);
 }
 
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.theme-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  border: 1px solid #dbe4ff;
+  background: #ffffff;
+  color: #334155;
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.theme-toggle-btn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+}
+
+.theme-toggle-btn:active {
+  transform: translateY(0);
+}
+
+.theme-icon {
+  display: block;
+  transition: transform 0.2s ease;
+}
+
+.theme-toggle-btn:hover .theme-icon {
+  transform: rotate(15deg);
+}
+
+.login-theme-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 100;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
 .nav-links {
   display: flex;
   align-items: center;
@@ -1104,19 +1159,100 @@ form button[type="button"]:hover {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 80vh;
-  padding: 24px 16px;
+  min-height: 100vh;
+  padding: 32px 20px;
+  box-sizing: border-box;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 880px;
+  margin: 0 auto;
+  background: #ffffff;
+  border: 1px solid #dbe4ff;
+  border-radius: 18px;
+  box-shadow: 0 16px 40px rgba(24, 43, 92, 0.08);
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+  align-items: stretch;
+}
+
+.login-card-left {
+  flex: 1.1;
+  position: relative;
+  overflow: hidden;
+  min-height: 500px;
+  background: transparent;
+  display: flex;
+}
+
+.login-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: left center;
+  display: block;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    #000000 0%,
+    #000000 86%,
+    rgba(0, 0, 0, 0.88) 92%,
+    rgba(0, 0, 0, 0.45) 97%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    #000000 0%,
+    #000000 86%,
+    rgba(0, 0, 0, 0.88) 92%,
+    rgba(0, 0, 0, 0.45) 97%,
+    transparent 100%
+  );
+}
+
+/* Subtle, gentle edge feather into the form */
+.login-card-left::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    transparent 84%,
+    rgba(255, 255, 255, 0.25) 92%,
+    rgba(255, 255, 255, 0.75) 97%,
+    #ffffff 100%
+  );
+  pointer-events: none;
+  z-index: 2;
+}
+
+.login-card-divider {
+  display: none;
+}
+
+.login-card-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 44px 38px;
+  background: #ffffff;
 }
 
 .login-form {
   width: 100%;
-  max-width: 480px;
+  max-width: 360px;
   margin: 0 auto;
-  padding: 45px 40px;
-  background: white;
-  border: 1px solid #dbe4ff;
-  border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
 
   display: flex;
   flex-direction: column;
@@ -1404,6 +1540,10 @@ form button[type="button"]:hover {
   .navbar {
     padding: 0 16px;
     height: 60px;
+  }
+
+  .navbar-actions {
+    gap: 10px;
   }
 
   .hamburger-btn {
@@ -1844,13 +1984,67 @@ form button[type="button"]:hover {
   }
 
   .login-wrapper {
-    padding: 16px;
+    padding: 20px 14px;
+    min-height: 100vh;
+  }
+
+  .login-card {
+    flex-direction: column;
+    max-width: 440px;
+    border-radius: 16px;
+  }
+
+  .login-card-left {
+    min-height: 180px;
+    max-height: 220px;
+  }
+
+  .login-card-img {
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      #000000 0%,
+      #000000 84%,
+      rgba(0, 0, 0, 0.88) 92%,
+      rgba(0, 0, 0, 0.45) 97%,
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      #000000 0%,
+      #000000 84%,
+      rgba(0, 0, 0, 0.88) 92%,
+      rgba(0, 0, 0, 0.45) 97%,
+      transparent 100%
+    );
+  }
+
+  .login-card-left::after {
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      transparent 84%,
+      rgba(255, 255, 255, 0.25) 92%,
+      rgba(255, 255, 255, 0.75) 97%,
+      #ffffff 100%
+    );
+  }
+
+  .login-card-divider {
+    display: none;
+  }
+
+  .login-card-right {
+    padding: 28px 20px;
   }
 
   .login-form {
-    padding: 28px 18px;
     gap: 16px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
   }
 
   .login-form h2 {
@@ -1884,4 +2078,584 @@ form button[type="button"]:hover {
   .pagination span {
     font-size: 13px;
   }
+}
+
+/* =========================================
+   DARK THEME: MATTE FINISHED BLACK [data-theme="dark"]
+========================================= */
+
+[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+[data-theme="dark"] body {
+  background: #09090b;
+  color: #d4d4d8;
+}
+
+[data-theme="dark"] .app {
+  background: #09090b;
+}
+
+/* Navbar */
+[data-theme="dark"] .navbar {
+  background: rgba(12, 12, 14, 0.94);
+  border-bottom: 1px solid #1f1f23;
+  backdrop-filter: blur(14px);
+}
+
+[data-theme="dark"] .nav-brand {
+  color: #fafafa;
+}
+
+[data-theme="dark"] .brand-dot {
+  background: #e4e4e7;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .nav-links button {
+  color: #8e8e93;
+}
+
+[data-theme="dark"] .nav-links button:hover {
+  color: #fafafa;
+}
+
+[data-theme="dark"] .nav-links button.active {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+[data-theme="dark"] .nav-links button::after {
+  background: #ffffff;
+  height: 1.5px;
+}
+
+[data-theme="dark"] .nav-links .logout-nav-btn {
+  color: #f87171;
+}
+
+[data-theme="dark"] .nav-links .logout-nav-btn:hover {
+  color: #ef4444;
+}
+
+[data-theme="dark"] .nav-links .logout-nav-btn:hover::after {
+  background: #ef4444;
+}
+
+[data-theme="dark"] .hamburger-btn {
+  border-color: #27272a;
+  background: #141416;
+}
+
+[data-theme="dark"] .hamburger-btn:hover {
+  background: #1c1c20;
+  border-color: #38383e;
+}
+
+[data-theme="dark"] .hamburger-bar {
+  background-color: #e4e4e7;
+}
+
+[data-theme="dark"] .theme-toggle-btn {
+  background: #141417;
+  border-color: #26262b;
+  color: #d4d4d8;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .theme-toggle-btn:hover {
+  background: #1e1e24;
+  border-color: #3f3f46;
+  color: #ffffff;
+}
+
+[data-theme="dark"] .login-theme-toggle {
+  background: #141417;
+  border-color: #26262b;
+  color: #d4d4d8;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="dark"] .login-theme-toggle:hover {
+  background: #1e1e24;
+  border-color: #3f3f46;
+}
+
+/* Mobile dropdown menu */
+[data-theme="dark"] .nav-links.open {
+  background: rgba(14, 14, 16, 0.98);
+  border-bottom: 1px solid #222226;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
+}
+
+[data-theme="dark"] .nav-links button {
+  color: #a1a1aa;
+}
+
+[data-theme="dark"] .nav-links button:hover {
+  background: #19191d;
+  color: #ffffff;
+}
+
+[data-theme="dark"] .nav-links button.active {
+  background: #222227;
+  color: #ffffff;
+}
+
+[data-theme="dark"] .nav-links .logout-nav-btn {
+  border-top-color: #222226;
+  color: #f87171;
+}
+
+[data-theme="dark"] .nav-links .logout-nav-btn:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #fca5a5;
+}
+
+[data-theme="dark"] .mobile-backdrop {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+/* Headings & Texts */
+[data-theme="dark"] .app > h1,
+[data-theme="dark"] .dashboard h2,
+[data-theme="dark"] .section-header h2,
+[data-theme="dark"] .productlist h3,
+[data-theme="dark"] .supplierlist h3,
+[data-theme="dark"] .shipment-list h2,
+[data-theme="dark"] .recent-shipments h3,
+[data-theme="dark"] .quick-actions h3,
+[data-theme="dark"] .status-breakdown > h3 {
+  color: #fafafa;
+}
+
+[data-theme="dark"] .dashboard > p {
+  color: #71717a;
+}
+
+/* Primary buttons in Matte Dark Theme */
+[data-theme="dark"] .app > button,
+[data-theme="dark"] .productlist > button,
+[data-theme="dark"] .supplierlist > button,
+[data-theme="dark"] .section-header button,
+[data-theme="dark"] .form button,
+[data-theme="dark"] .login-form button {
+  background: #e4e4e7;
+  color: #09090b;
+  font-weight: 600;
+  border: 1px solid #f4f4f5;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .app > button:hover,
+[data-theme="dark"] .productlist > button:hover,
+[data-theme="dark"] .supplierlist > button:hover,
+[data-theme="dark"] .section-header button:hover,
+[data-theme="dark"] .form button:hover,
+[data-theme="dark"] .login-form button:hover {
+  background: #ffffff;
+  color: #000000;
+  transform: translateY(-1px);
+}
+
+/* Stat Cards (Matte Neutral Graphite) */
+[data-theme="dark"] .stat-card {
+  background: #141417;
+  border: 1px solid #222226;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .stat-card:hover {
+  border-color: #38383e;
+  background: #18181c;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .stat-card h3 {
+  color: #71717a;
+}
+
+[data-theme="dark"] .stat-card h1 {
+  color: #fafafa;
+}
+
+/* Status Breakdown */
+[data-theme="dark"] .status-breakdown {
+  background: #101013;
+  border: 1px solid #1c1c20;
+}
+
+[data-theme="dark"] .status-box {
+  background: #141417;
+  border: 1px solid #222226;
+}
+
+[data-theme="dark"] .status-box span {
+  color: #a1a1aa;
+}
+
+[data-theme="dark"] .status-box strong {
+  color: #fafafa;
+}
+
+[data-theme="dark"] .status-box.pending {
+  border-left: 3px solid #d97706;
+}
+
+[data-theme="dark"] .status-box.in-transit {
+  border-left: 3px solid #3b82f6;
+}
+
+[data-theme="dark"] .status-box.delivered {
+  border-left: 3px solid #10b981;
+}
+
+/* Status Badges */
+[data-theme="dark"] .status.pending {
+  background: rgba(217, 119, 6, 0.12);
+  color: #fbbf24;
+  border: 1px solid rgba(217, 119, 6, 0.25);
+}
+
+[data-theme="dark"] .status.in-transit {
+  background: rgba(59, 130, 246, 0.12);
+  color: #93c5fd;
+  border: 1px solid rgba(59, 130, 246, 0.25);
+}
+
+[data-theme="dark"] .status.delivered {
+  background: rgba(16, 185, 129, 0.12);
+  color: #6ee7b7;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+/* Recent Shipments */
+[data-theme="dark"] .recent-shipments {
+  background: #141417;
+  border: 1px solid #222226;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .recent-shipment {
+  border-bottom: 1px solid #1c1c20;
+}
+
+[data-theme="dark"] .recent-shipment strong {
+  color: #e4e4e7;
+}
+
+[data-theme="dark"] .recent-shipment p {
+  color: #71717a;
+}
+
+/* Quick Actions */
+[data-theme="dark"] .action-grid button {
+  background: #141417;
+  border: 1px solid #222226;
+  color: #d4d4d8;
+}
+
+[data-theme="dark"] .action-grid button:hover {
+  background: #1a1a1e;
+  border-color: #38383e;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+/* Forms, Inputs, Selects */
+[data-theme="dark"] form,
+[data-theme="dark"] .form-card,
+[data-theme="dark"] .inline-form {
+  background: #141417;
+  border: 1px solid #222226;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] form h2,
+[data-theme="dark"] form h3,
+[data-theme="dark"] .form-card h3 {
+  color: #fafafa;
+}
+
+[data-theme="dark"] input,
+[data-theme="dark"] select {
+  background: #0d0d0f;
+  border: 1px solid #27272a;
+  color: #f4f4f5;
+}
+
+[data-theme="dark"] input::placeholder {
+  color: #52525b;
+}
+
+[data-theme="dark"] input:focus,
+[data-theme="dark"] select:focus {
+  border-color: #52525b;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] form button[type="button"] {
+  background: #1a1a1e;
+  border: 1px solid #28282e;
+  color: #a1a1aa;
+}
+
+[data-theme="dark"] form button[type="button"]:hover {
+  background: #242429;
+  border-color: #38383e;
+  color: #ffffff;
+}
+
+/* Shipments List & Cards (Desktop & Mobile) */
+[data-theme="dark"] .shipment-list > div {
+  background: #141417;
+  border: 1px solid #222226;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .shipment-list > div:hover {
+  background: #19191e;
+  border-color: #38383e;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="dark"] .shipment-list h2 {
+  color: #fafafa;
+}
+
+[data-theme="dark"] .shipment-list p {
+  color: #a1a1aa;
+}
+
+[data-theme="dark"] .shipment-list button {
+  background: #1a1a1e;
+  border: 1px solid #28282e;
+  color: #d4d4d8;
+}
+
+[data-theme="dark"] .shipment-list button:hover {
+  background: #242429;
+  border-color: #38383e;
+  color: #ffffff;
+}
+
+/* Products Cards (Desktop & Mobile) */
+[data-theme="dark"] .productlist > div {
+  background: #141417;
+  border: 1px solid #222226;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .productlist > div:hover {
+  background: #19191e;
+  border-color: #38383e;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="dark"] .productlist div p {
+  color: #fafafa;
+}
+
+[data-theme="dark"] .productlist div button {
+  background: #1a1a1e;
+  border: 1px solid #28282e;
+  color: #d4d4d8;
+}
+
+[data-theme="dark"] .productlist div button:hover {
+  background: #242429;
+  border-color: #38383e;
+  color: #ffffff;
+}
+
+/* Suppliers Cards (Desktop & Mobile) */
+[data-theme="dark"] .supplierlist > div.supplier-card {
+  background: #141417;
+  border: 1px solid #222226;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .supplierlist > div.supplier-card:hover {
+  background: #19191e;
+  border-color: #38383e;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+
+[data-theme="dark"] .supplierlist p:first-child {
+  color: #fafafa;
+}
+
+[data-theme="dark"] .supplierlist p {
+  color: #71717a;
+}
+
+[data-theme="dark"] .supplierlist div button {
+  background: #1a1a1e;
+  border: 1px solid #28282e;
+  color: #d4d4d8;
+}
+
+[data-theme="dark"] .supplierlist div button:hover {
+  background: #242429;
+  border-color: #38383e;
+  color: #ffffff;
+}
+
+/* Mobile subtle watermark circle accents */
+[data-theme="dark"] .productlist > div.product-card::before,
+[data-theme="dark"] .productlist > div.product-card::after,
+[data-theme="dark"] .supplierlist > div.supplier-card::before,
+[data-theme="dark"] .supplierlist > div.supplier-card::after,
+[data-theme="dark"] .shipment-list > div::before,
+[data-theme="dark"] .shipment-list > div::after {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.035);
+}
+
+[data-theme="dark"] .productlist .product-card .card-actions,
+[data-theme="dark"] .supplierlist .supplier-card .card-actions {
+  border-top: 1px solid #1f1f23;
+}
+
+/* Users Section & Table */
+[data-theme="dark"] .section {
+  color: #d4d4d8;
+}
+
+[data-theme="dark"] .form {
+  background: #141417;
+  border: 1px solid #222226;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .form input,
+[data-theme="dark"] .form select {
+  background: #0d0d0f;
+  border-color: #27272a;
+  color: #f4f4f5;
+}
+
+[data-theme="dark"] .table-container {
+  background: #141417;
+  border: 1px solid #222226;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .table-container th {
+  background: #0f0f11;
+  color: #a1a1aa;
+  border-bottom: 1px solid #222226;
+}
+
+[data-theme="dark"] .table-container td {
+  color: #d4d4d8;
+  border-bottom: 1px solid #1a1a1e;
+}
+
+[data-theme="dark"] .table-container tbody tr:hover {
+  background: #19191d;
+}
+
+[data-theme="dark"] .role-admin {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fafafa;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+[data-theme="dark"] .role-user {
+  background: rgba(161, 161, 170, 0.1);
+  color: #a1a1aa;
+  border: 1px solid rgba(161, 161, 170, 0.15);
+}
+
+[data-theme="dark"] .role-supplier {
+  background: rgba(147, 197, 253, 0.1);
+  color: #93c5fd;
+  border: 1px solid rgba(147, 197, 253, 0.15);
+}
+
+/* Pagination */
+[data-theme="dark"] .pagination button {
+  background: #1a1a1e;
+  border: 1px solid #28282e;
+  color: #d4d4d8;
+}
+
+[data-theme="dark"] .pagination button:hover:not(:disabled) {
+  background: #242429;
+  border-color: #38383e;
+  color: #ffffff;
+}
+
+[data-theme="dark"] .pagination span {
+  color: #71717a;
+}
+
+/* Login Page */
+[data-theme="dark"] .login-wrapper {
+  background: #09090b;
+}
+
+[data-theme="dark"] .login-card {
+  background: #121214;
+  border: 1px solid #222226;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85);
+}
+
+[data-theme="dark"] .login-card-left {
+  background: transparent;
+}
+
+[data-theme="dark"] .login-card-left::after {
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    transparent 84%,
+    rgba(18, 18, 20, 0.25) 92%,
+    rgba(18, 18, 20, 0.75) 97%,
+    #121214 100%
+  );
+}
+
+@media (max-width: 640px) {
+  [data-theme="dark"] .login-card-left::after {
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      transparent 84%,
+      rgba(18, 18, 20, 0.25) 92%,
+      rgba(18, 18, 20, 0.75) 97%,
+      #121214 100%
+    );
+  }
+}
+
+[data-theme="dark"] .login-card-divider {
+  display: none;
+}
+
+[data-theme="dark"] .login-card-right {
+  background: #121214;
+}
+
+[data-theme="dark"] .login-form {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+[data-theme="dark"] .login-form h2 {
+  color: #fafafa;
+}
+
+[data-theme="dark"] .login-form p {
+  color: #a1a1aa;
+}
+
+[data-theme="dark"] .login-form i {
+  background: #0a0a0c;
+  border: 1px solid #1c1c20;
+  color: #71717a;
 }
