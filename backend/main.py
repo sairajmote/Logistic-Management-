@@ -897,20 +897,12 @@ def delete_product(product_id: int, current_user: dict = Depends(require_admin))
     status_code=201,
     response_model=SupplierResponse
 )
-def create_supplier(supplier: Supplier, current_user: dict = Depends(require_admin)):
-
+def create_supplier(
+    supplier: Supplier,
+    current_user: dict = Depends(require_admin)
+):
     conn = None
     cursor = None
-    if current_user["role"] == "supplier":
-        raise HTTPException(
-            status_code=403,
-            detail= "Suppliers can not view suppliers"
-        )
-    if get_current_user["role"] == "supplier":
-        raise HTTPException(
-            status_code=403,
-            detail= "Suppliers can not view suppliers"
-        )
 
     try:
         conn = get_db_connection()
@@ -926,11 +918,9 @@ def create_supplier(supplier: Supplier, current_user: dict = Depends(require_adm
         )
 
         new_supplier = cursor.fetchone()
-
         conn.commit()
 
         return {
-            
             "id": new_supplier[0],
             "name": new_supplier[1],
             "country": new_supplier[2]
@@ -950,10 +940,7 @@ def create_supplier(supplier: Supplier, current_user: dict = Depends(require_adm
             cursor.close()
 
         if conn:
-            conn.close()
-
-
-# GET ALL SUPPLIERS
+            conn.close()# GET ALL SUPPLIERS
 @app.get(
     "/suppliers",
     response_model=list[SupplierResponse]
