@@ -564,7 +564,10 @@ function App() {
     return (
       <form onSubmit={handleLogin} className="login-form">
         <h2>Commodity Management System</h2>
-        <p>Sign in to your account</p>
+        <i>"User Name": Demo Admin <br />
+           "Password": Demo@123
+        </i>
+        <p >Sign in to your account</p>
         <input
           type="text"
           placeholder="Username"
