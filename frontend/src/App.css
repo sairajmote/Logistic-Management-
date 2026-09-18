@@ -989,12 +989,55 @@ form button:hover {
     padding: 15px 10px;
   }
 }
-.login-Card{
+/* =========================
+   Login Page
+   ========================= */
+
+.login-form {
+  width: 580px;
+  margin: 120px auto;
+  padding: 55px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  
+  gap: 25px;
+}
+
+.login-form input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 14px 16px;
+  border: 1px solid #d5def5;
+  border-radius: 10px;
+  font-size: 16px;
+  outline: none;
+}
+
+.login-form input:focus {
+  border-color: #4f7cff;
+  box-shadow: 0 0 0 3px rgba(79, 124, 255, 0.12);
+}
+
+.login-form button {
+  align-self: center;
+  padding: 12px 28px;
+  border: none;
+  border-radius: 10px;
+  background: #4f7cff;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.login-form p{
+  font-weight: bold;
+
+}
+.login-form button:hover {
+  background: #3f6df0;
 }
 /* =========================
    USERS SECTION

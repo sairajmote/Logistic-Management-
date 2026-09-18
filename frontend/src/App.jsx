@@ -1,62 +1,75 @@
 import { useEffect, useState } from "react";
-import "./App.css"
+import "./App.css";
+
+const API_URL = import.meta.env.VITE_API_URL;
+
+console.log("API URL:", API_URL);
+
 function App() {
-
-
   const [shipments, setShipments] = useState([]);
   const [showform, setShowform] = useState(false);
-  const [newshipment, setNewshipment] = useState(
-    {
-      product_id: "",
-      supplier_id: "",
-      quantity: "",
-      origin: "",
-      destination: "",
-      status: ""
-    });
+
+  const [newshipment, setNewshipment] = useState({
+    product_id: "",
+    supplier_id: "",
+    quantity: "",
+    origin: "",
+    destination: "",
+    status: ""
+  });
+
   const [products, setProducts] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
   const [editId, setEditId] = useState(null);
+
   const [showProductForm, setShowProductForm] = useState(false);
   const [newProduct, setNewProduct] = useState("");
   const [editProductId, setEditProductId] = useState(null);
+
   const [showSupplierForm, setShowSupplierForm] = useState(false);
   const [newSupplier, setNewSupplier] = useState({
     name: "",
     country: ""
   });
   const [editSupplierId, setEditSupplierId] = useState(null);
+
   const [activeSection, setActiveSection] = useState("dashboard");
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
   const shipmentsPerPage = 6;
+
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [username, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState(null);
+
   const [users, setUsers] = useState([]);
   const [showUserForm, setShowUserForm] = useState(false);
+
   const [newUser, setNewUser] = useState({
     username: "",
     password: "",
     role: "user",
     supplier_id: ""
   });
+
   const totalShipments = shipments.length;
   const totalProducts = products.length;
   const totalSuppliers = suppliers.length;
+
   const pendingShipments = shipments.filter(
     (shipment) => shipment.status === "Pending"
   ).length;
+
   const inTransitShipments = shipments.filter(
     (shipment) => shipment.status === "In Transit"
   ).length;
 
   const deliveredShipments = shipments.filter(
     (shipment) => shipment.status === "Delivered"
-
   ).length;
+
   const filteredShipments = shipments.filter((shipment) => {
     const matchesSearch =
       shipment.product.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -70,7 +83,9 @@ function App() {
     return matchesSearch && matchesStatus;
   });
 
-  const totalPages = Math.ceil(filteredShipments.length / shipmentsPerPage);
+  const totalPages = Math.ceil(
+    filteredShipments.length / shipmentsPerPage
+  );
 
   const startIndex = (currentPage - 1) * shipmentsPerPage;
 
@@ -79,29 +94,31 @@ function App() {
     startIndex + shipmentsPerPage
   );
 
-
   useEffect(() => {
-    if (!token)
-      return;
-    const payload = JSON.parse(atob(token.split(".")[1]));
+    if (!token) return;
+
+    const payload = JSON.parse(
+      atob(token.split(".")[1])
+    );
+
     setRole(payload.role);
 
-    fetch("http://127.0.0.1:8000/shipments", {
+    fetch(`${API_URL}/shipments`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
     })
       .then((response) => {
         if (!response.ok) {
-          throw new Error("Failed to load Shipment")
+          throw new Error("Failed to load Shipment");
         }
-        return response.json();
-      }
-      )
-      .then((data) => setShipments(data))
-      .catch((error) => alert(error.message))
 
-    fetch("http://127.0.0.1:8000/products", {
+        return response.json();
+      })
+      .then((data) => setShipments(data))
+      .catch((error) => alert(error.message));
+
+    fetch(`${API_URL}/products`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -116,7 +133,7 @@ function App() {
       .then((data) => setProducts(data))
       .catch((error) => alert(error.message));
 
-    fetch("http://127.0.0.1:8000/suppliers", {
+    fetch(`${API_URL}/suppliers`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -132,7 +149,7 @@ function App() {
       .catch((error) => alert(error.message));
 
     if (payload.role === "admin") {
-      fetch("http://127.0.0.1:8000/users", {
+      fetch(`${API_URL}/users`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -141,27 +158,28 @@ function App() {
         .then((data) => setUsers(data))
         .catch((error) => console.error(error));
     }
-  },
-    [token]);
+  }, [token]);
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [activeSection]);
+
   useEffect(() => {
     if (activeSection !== "shipments") {
       setShowform(false);
     }
   }, [activeSection]);
+
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, statusFilter]);
-
 
   async function handleSubmit(e) {
     e.preventDefault();
 
     const url = editId
-      ? `http://127.0.0.1:8000/shipments/${editId}`
-      : "http://127.0.0.1:8000/shipments";
+      ? `${API_URL}/shipments/${editId}`
+      : `${API_URL}/shipments`;
 
     const method = editId ? "PUT" : "POST";
 
@@ -180,13 +198,15 @@ function App() {
     });
 
     const data = await response.json();
+
     if (!response.ok) {
-      alert(data.detail)
+      alert(data.detail);
+      return;
     }
 
     if (response.ok) {
       const updatedResponse = await fetch(
-        "http://127.0.0.1:8000/shipments",
+        `${API_URL}/shipments`,
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -195,6 +215,7 @@ function App() {
       );
 
       const updatedShipments = await updatedResponse.json();
+
       setShipments(updatedShipments);
 
       setNewshipment({
@@ -210,8 +231,10 @@ function App() {
       setShowform(false);
     }
   }
+
   async function handleDelete(id) {
-    const response = await fetch(`http://127.0.0.1:8000/shipments/${id}`,
+    const response = await fetch(
+      `${API_URL}/shipments/${id}`,
       {
         method: "DELETE",
         headers: {
@@ -219,24 +242,27 @@ function App() {
         }
       }
     );
+
     if (!response.ok) {
       const data = await response.json();
       alert(data.detail);
       return;
     }
+
     if (response.ok) {
       const updatedResponse = await fetch(
-        "http://127.0.0.1:8000/shipments", {
-        headers: {
-          Authorization: `Bearer ${token}`
+        `${API_URL}/shipments`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         }
-      }
       );
+
       const updatedShipments = await updatedResponse.json();
+
       setShipments(updatedShipments);
     }
-
-
   }
 
   async function handleEdit(shipment) {
@@ -253,10 +279,11 @@ function App() {
 
     setShowform(true);
   }
+
   async function handleAddProduct() {
     const url = editProductId
-      ? `http://127.0.0.1:8000/products/${editProductId}`
-      : "http://127.0.0.1:8000/products";
+      ? `${API_URL}/products/${editProductId}`
+      : `${API_URL}/products`;
 
     const method = editProductId ? "PUT" : "POST";
 
@@ -270,6 +297,7 @@ function App() {
         name: newProduct
       })
     });
+
     if (!response.ok) {
       const data = await response.json();
       alert(data.detail);
@@ -278,16 +306,17 @@ function App() {
 
     if (response.ok) {
       const updatedResponse = await fetch(
-        "http://127.0.0.1:8000/products", {
-        headers: {
-          Authorization: `Bearer ${token}`
+        `${API_URL}/products`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         }
-      }
       );
 
       const updatedProducts = await updatedResponse.json();
-      setProducts(updatedProducts);
 
+      setProducts(updatedProducts);
       setNewProduct("");
       setEditProductId(null);
       setShowProductForm(false);
@@ -295,31 +324,38 @@ function App() {
   }
 
   async function handleDeleteProduct(id) {
-    const response = await fetch(`http://127.0.0.1:8000/products/${id}`,
+    const response = await fetch(
+      `${API_URL}/products/${id}`,
       {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` }
-
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
       }
-    ); if (!response.ok) {
+    );
+
+    if (!response.ok) {
       const data = await response.json();
       alert(data.detail);
       return;
     }
 
     if (response.ok) {
-      const updatedResponse = await fetch("http://127.0.0.1:8000/products",
+      const updatedResponse = await fetch(
+        `${API_URL}/products`,
         {
           headers: {
-            Authorization: `bearer ${token}`
+            Authorization: `Bearer ${token}`
           }
         }
       );
-      const updatedProducts = await updatedResponse.json();
-      setProducts(updatedProducts)
-    };
 
+      const updatedProducts = await updatedResponse.json();
+
+      setProducts(updatedProducts);
+    }
   }
+
   async function handleEditProduct(product) {
     setEditProductId(product.id);
     setNewProduct(product.name);
@@ -328,8 +364,8 @@ function App() {
 
   async function handleAddSupplier() {
     const url = editSupplierId
-      ? `http://127.0.0.1:8000/suppliers/${editSupplierId}`
-      : "http://127.0.0.1:8000/suppliers";
+      ? `${API_URL}/suppliers/${editSupplierId}`
+      : `${API_URL}/suppliers`;
 
     const method = editSupplierId ? "PUT" : "POST";
 
@@ -341,6 +377,7 @@ function App() {
       },
       body: JSON.stringify(newSupplier)
     });
+
     if (!response.ok) {
       const data = await response.json();
       alert(data.detail);
@@ -349,11 +386,12 @@ function App() {
 
     if (response.ok) {
       const updatedResponse = await fetch(
-        "http://127.0.0.1:8000/suppliers", {
-        headers: {
-          Authorization: `Bearer ${token}`
+        `${API_URL}/suppliers`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         }
-      }
       );
 
       const updatedSuppliers = await updatedResponse.json();
@@ -370,7 +408,6 @@ function App() {
     }
   }
 
-
   function handleEditSupplier(supplier) {
     setEditSupplierId(supplier.id);
 
@@ -382,10 +419,9 @@ function App() {
     setShowSupplierForm(true);
   }
 
-
   async function handleDeleteSupplier(id) {
     const response = await fetch(
-      `http://127.0.0.1:8000/suppliers/${id}`,
+      `${API_URL}/suppliers/${id}`,
       {
         method: "DELETE",
         headers: {
@@ -393,18 +429,21 @@ function App() {
         }
       }
     );
+
     if (!response.ok) {
       const data = await response.json();
       alert(data.detail);
       return;
     }
+
     if (response.ok) {
       const updatedResponse = await fetch(
-        "http://127.0.0.1:8000/suppliers", {
-        headers: {
-          Authorization: `bearer ${token}`
+        `${API_URL}/suppliers`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         }
-      }
       );
 
       const updatedSuppliers = await updatedResponse.json();
@@ -412,6 +451,7 @@ function App() {
       setSuppliers(updatedSuppliers);
     }
   }
+
   async function getErrorMessage(response) {
     try {
       const data = await response.json();
@@ -432,7 +472,7 @@ function App() {
     e.preventDefault();
 
     const response = await fetch(
-      "http://127.0.0.1:8000/login",
+      `${API_URL}/login`,
       {
         method: "POST",
         headers: {
@@ -453,6 +493,7 @@ function App() {
     }
 
     localStorage.setItem("token", data.access_token);
+
     setToken(data.access_token);
 
     const payload = JSON.parse(
@@ -465,12 +506,11 @@ function App() {
     setPassword("");
   }
 
-
   async function handleAddUser(e) {
     e.preventDefault();
 
     const response = await fetch(
-      "http://127.0.0.1:8000/users",
+      `${API_URL}/users`,
       {
         method: "POST",
         headers: {
@@ -498,7 +538,7 @@ function App() {
 
     // Refresh users after creating one
     const updatedResponse = await fetch(
-      "http://127.0.0.1:8000/users",
+      `${API_URL}/users`,
       {
         headers: {
           Authorization: `Bearer ${token}`
@@ -522,7 +562,9 @@ function App() {
 
   if (!token) {
     return (
-      <form onSubmit={handleLogin} className="login-Card">
+      <form onSubmit={handleLogin} className="login-form">
+        <h2>Commodity Management System</h2>
+        <p>Sign in to your account</p>
         <input
           type="text"
           placeholder="Username"
@@ -537,141 +579,208 @@ function App() {
           onChange={(e) => setPassword(e.target.value)}
         />
 
-        <button type="submit">Login</button>
+        <button type="submit">
+          Login
+        </button>
       </form>
     );
   }
 
-
   return (
-
     <div className="app">
+
       <div className="navbar">
-        <button onClick={() => setActiveSection("dashboard")}>Dashboard</button>
-        <button onClick={() => setActiveSection("shipments")}>Shipments</button>
-        <button onClick={() => setActiveSection("products")}>Products</button>
-        {role != "supplier" && (<button onClick={() => setActiveSection("suppliers")}>Supplier</button>)}
+
+        <button
+          onClick={() => setActiveSection("dashboard")}
+        >
+          Dashboard
+        </button>
+
+        <button
+          onClick={() => setActiveSection("shipments")}
+        >
+          Shipments
+        </button>
+
+        <button
+          onClick={() => setActiveSection("products")}
+        >
+          Products
+        </button>
+
+        {role !== "supplier" && (
+          <button
+            onClick={() => setActiveSection("suppliers")}
+          >
+            Supplier
+          </button>
+        )}
+
         {role === "admin" && (
-          <button onClick={() => setActiveSection("users")}>
+          <button
+            onClick={() => setActiveSection("users")}
+          >
             Users
           </button>
         )}
-        <button onClick={() => {
-          localStorage.removeItem("token");
-          setToken(null)
-        }}>
+
+        <button
+          onClick={() => {
+            localStorage.removeItem("token");
+            setToken(null);
+          }}
+        >
           Log Out
         </button>
+
       </div>
 
-      <h1>Commmodity Manaegment System</h1>
+      <h1>
+        Commmodity Manaegment System
+      </h1>
 
       {showform && (
         <>
-
           <form onSubmit={handleSubmit}>
 
-            {
-              role === "admin" && (
-                <div>
-                  <select
-                    value={newshipment.product_id}
-                    onChange={(e) =>
-                      setNewshipment({
-                        ...newshipment,
-                        product_id: e.target.value
-                      })
-                    }
-                  >
-                    <option value="">Select Product</option>
+            {role === "admin" && (
+              <div>
+                <select
+                  value={newshipment.product_id}
+                  onChange={(e) =>
+                    setNewshipment({
+                      ...newshipment,
+                      product_id: e.target.value
+                    })
+                  }
+                >
+                  <option value="">
+                    Select Product
+                  </option>
 
-                    {products.map((product) => (
-                      <option key={product.id} value={product.id}>
-                        {product.name}
-                      </option>
-                    ))}
-                  </select>
-
-                </div>
-              )
-            }
+                  {products.map((product) => (
+                    <option
+                      key={product.id}
+                      value={product.id}
+                    >
+                      {product.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             <div>
-              <select value={newshipment.supplier_id}
+              <select
+                value={newshipment.supplier_id}
                 onChange={(e) =>
                   setNewshipment({
-                    ...newshipment, supplier_id: e.target.value
+                    ...newshipment,
+                    supplier_id: e.target.value
                   })
-                }>
-                <option value="">Select Supplier</option>
-                {
-                  suppliers.map((supplier) => (
-                    <option key={supplier.id} value={supplier.id}>{supplier.name}</option>
-
-                  ))
                 }
+              >
+                <option value="">
+                  Select Supplier
+                </option>
 
-
-
+                {suppliers.map((supplier) => (
+                  <option
+                    key={supplier.id}
+                    value={supplier.id}
+                  >
+                    {supplier.name}
+                  </option>
+                ))}
               </select>
             </div>
-            {
-              role === "admin" && (<div>
-                <input placeholder="Quantity" value={newshipment.quantity} onChange={(e) =>
-                  setNewshipment(
-                    {
-                      ...newshipment, quantity: e.target.value
-                    }
-                  )
-                } />
-              </div>
-              )
-            }
-            {
-              role === "admin" && (<div>
-                <input placeholder="Origin" value={newshipment.origin} onChange={(e) =>
-                  setNewshipment(
-                    {
-                      ...newshipment, origin: e.target.value
-                    }
-                  )
-                } />
-              </div>)
-            }
 
-            {
-              role === "admin" && (<div>
-                <input placeholder="Destination" value={newshipment.destination} onChange={(e) =>
-                  setNewshipment(
-                    {
-                      ...newshipment, destination: e.target.value
-                    }
-                  )
-                } />
+            {role === "admin" && (
+              <div>
+                <input
+                  placeholder="Quantity"
+                  value={newshipment.quantity}
+                  onChange={(e) =>
+                    setNewshipment({
+                      ...newshipment,
+                      quantity: e.target.value
+                    })
+                  }
+                />
               </div>
-              )
-            }
+            )}
+
+            {role === "admin" && (
+              <div>
+                <input
+                  placeholder="Origin"
+                  value={newshipment.origin}
+                  onChange={(e) =>
+                    setNewshipment({
+                      ...newshipment,
+                      origin: e.target.value
+                    })
+                  }
+                />
+              </div>
+            )}
+
+            {role === "admin" && (
+              <div>
+                <input
+                  placeholder="Destination"
+                  value={newshipment.destination}
+                  onChange={(e) =>
+                    setNewshipment({
+                      ...newshipment,
+                      destination: e.target.value
+                    })
+                  }
+                />
+              </div>
+            )}
+
             <div>
-              <select value={newshipment.status} onChange={(e) =>
-                setNewshipment({
-                  ...newshipment, status: e.target.value
-                })
-              }>
-                <option value="">Select Status</option>
-                <option value="Pending">Pending</option>
-                <option value="In Transit">In Transit</option>
-                <option value="Delivered">Delivered</option>
+              <select
+                value={newshipment.status}
+                onChange={(e) =>
+                  setNewshipment({
+                    ...newshipment,
+                    status: e.target.value
+                  })
+                }
+              >
+                <option value="">
+                  Select Status
+                </option>
+
+                <option value="Pending">
+                  Pending
+                </option>
+
+                <option value="In Transit">
+                  In Transit
+                </option>
+
+                <option value="Delivered">
+                  Delivered
+                </option>
               </select>
             </div>
 
             <button type="submit">
-              {editId ? "Update Shipment" : "Create Shipment"}
+              {editId
+                ? "Update Shipment"
+                : "Create Shipment"}
             </button>
+
             <button
               type="button"
               onClick={() => {
                 setShowform(false);
                 setEditId(null);
+
                 setNewshipment({
                   product_id: "",
                   supplier_id: "",
@@ -685,13 +794,20 @@ function App() {
               Cancel
             </button>
 
-          </form></>
+          </form>
+        </>
       )}
 
       {activeSection === "dashboard" && (
         <div className="dashboard">
-          <h2>Dashboard</h2>
-          <p>Overview of your commodity operations</p>
+
+          <h2>
+            Dashboard
+          </h2>
+
+          <p>
+            Overview of your commodity operations
+          </p>
 
           <div className="stats-grid">
 
@@ -714,9 +830,14 @@ function App() {
               <h3>Pending Shipments</h3>
               <h1>{pendingShipments}</h1>
             </div>
+
           </div>
+
           <div className="status-breakdown">
-            <h3>Shipment Status</h3>
+
+            <h3>
+              Shipment Status
+            </h3>
 
             <div className="status-grid">
 
@@ -724,7 +845,6 @@ function App() {
                 <span>Pending</span>
                 <strong>{pendingShipments}</strong>
               </div>
-
 
               <div className="status-box in-transit">
                 <span>In Transit</span>
@@ -738,362 +858,575 @@ function App() {
 
             </div>
           </div>
+
           <div className="recent-shipments">
-            <h3>Recent Shipments</h3>
 
-            {shipments.slice(-5).reverse().map((shipment) => (
-              <div className="recent-shipment" key={shipment.id}>
-                <div>
-                  <strong>{shipment.product}</strong>
-                  <p>{shipment.origin} → {shipment.destination}</p>
+            <h3>
+              Recent Shipments
+            </h3>
+
+            {shipments
+              .slice(-5)
+              .reverse()
+              .map((shipment) => (
+                <div
+                  className="recent-shipment"
+                  key={shipment.id}
+                >
+
+                  <div>
+                    <strong>
+                      {shipment.product}
+                    </strong>
+
+                    <p>
+                      {shipment.origin} → {shipment.destination}
+                    </p>
+                  </div>
+
+                  <span
+                    className={`status ${shipment.status
+                      .toLowerCase()
+                      .replace(" ", "-")}`}
+                  >
+                    {shipment.status}
+                  </span>
+
                 </div>
+              ))}
 
-                <span className={`status ${shipment.status.toLowerCase().replace(" ", "-")}`}>
-                  {shipment.status}
-                </span>
+          </div>
+
+          {role === "admin" && (
+            <div className="quick-actions">
+
+              <h3>
+                Quick Actions
+              </h3>
+
+              <div className="action-grid">
+
+                <button
+                  onClick={() => {
+                    setActiveSection("shipments");
+                    setShowform(true);
+                  }}
+                >
+                  + Add Shipment
+                </button>
+
+                <button
+                  onClick={() =>
+                    setActiveSection("products")
+                  }
+                >
+                  Manage Products
+                </button>
+
+                <button
+                  onClick={() =>
+                    setActiveSection("suppliers")
+                  }
+                >
+                  Manage Suppliers
+                </button>
+
               </div>
-            ))}
-          </div>
-          {role === "admin" && (<div className="quick-actions">
-            <h3>Quick Actions</h3>
-
-            <div className="action-grid">
-
-              <button onClick={() => {
-                setActiveSection("shipments");
-                setShowform(true);
-              }}>
-                + Add Shipment
-              </button>
-
-              <button onClick={() => setActiveSection("products")}>
-                Manage Products
-              </button>
-
-              <button onClick={() => setActiveSection("suppliers")}>
-                Manage Suppliers
-              </button>
-
             </div>
-          </div>
           )}
+
         </div>
       )}
 
-      {
-        activeSection === "shipments" && (
-          <>
-            {
-              role === "admin" && (<button onClick={() => setShowform(true)}>
-                Add Shipment
-              </button>)
-            }
-            <div className="shipment-filters">
-              <input
-                type="text"
-                placeholder="Search shipments..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
+      {activeSection === "shipments" && (
+        <>
+          {role === "admin" && (
+            <button
+              onClick={() => setShowform(true)}
+            >
+              Add Shipment
+            </button>
+          )}
 
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-              >
-                <option value="All">All Status</option>
-                <option value="Pending">Pending</option>
-                <option value="In Transit">In Transit</option>
-                <option value="Delivered">Delivered</option>
-              </select>
-            </div>
+          <div className="shipment-filters">
 
-            <div className="shipment-list" >
-              {paginatedShipments.map((shipment) => (
-                <div key={shipment.id}>
-                  <h2>Product: {shipment.product}</h2>
+            <input
+              type="text"
+              placeholder="Search shipments..."
+              value={searchTerm}
+              onChange={(e) =>
+                setSearchTerm(e.target.value)
+              }
+            />
 
-                  <p>Supplier: {shipment.supplier}</p>
-                  <p>Quantity: {shipment.quantity}</p>
-                  <p>Origin: {shipment.origin}</p>
-                  <p>Destination: {shipment.destination}</p>
-                  <p className={`status ${shipment.status.toLowerCase().replace(" ", "-")}`}>
-                    {shipment.status}
-                  </p>
-                  {(role === "admin" || role === "supplier") && (
-                    <button onClick={() => handleEdit(shipment)}>
-                      {role === "admin" ? "Edit" : "Update Status"}
+            <select
+              value={statusFilter}
+              onChange={(e) =>
+                setStatusFilter(e.target.value)
+              }
+            >
+              <option value="All">
+                All Status
+              </option>
+
+              <option value="Pending">
+                Pending
+              </option>
+
+              <option value="In Transit">
+                In Transit
+              </option>
+
+              <option value="Delivered">
+                Delivered
+              </option>
+            </select>
+
+          </div>
+
+          <div className="shipment-list">
+
+            {paginatedShipments.map((shipment) => (
+              <div key={shipment.id}>
+
+                <h2>
+                  Product: {shipment.product}
+                </h2>
+
+                <p>
+                  Supplier: {shipment.supplier}
+                </p>
+
+                <p>
+                  Quantity: {shipment.quantity}
+                </p>
+
+                <p>
+                  Origin: {shipment.origin}
+                </p>
+
+                <p>
+                  Destination: {shipment.destination}
+                </p>
+
+                <p
+                  className={`status ${shipment.status
+                    .toLowerCase()
+                    .replace(" ", "-")}`}
+                >
+                  {shipment.status}
+                </p>
+
+                {(role === "admin" ||
+                  role === "supplier") && (
+                    <button
+                      onClick={() =>
+                        handleEdit(shipment)
+                      }
+                    >
+                      {role === "admin"
+                        ? "Edit"
+                        : "Update Status"}
                     </button>
                   )}
-                  {role === "admin" && (<button onClick={() => handleDelete(shipment.id)}>Delete</button>)}
 
+                {role === "admin" && (
+                  <button
+                    onClick={() =>
+                      handleDelete(shipment.id)
+                    }
+                  >
+                    Delete
+                  </button>
+                )}
 
-                  <br />
-                </div>
-              ))}
-            </div>
-            <div className="pagination">
-              <button
-                onClick={() => setCurrentPage(currentPage - 1)}
-                disabled={currentPage === 1}
-              >
-                Previous
-              </button>
+                <br />
 
-              <span>
-                Page {currentPage} of {totalPages}
-              </span>
+              </div>
+            ))}
 
-              <button
-                onClick={() => setCurrentPage(currentPage + 1)}
-                disabled={currentPage === totalPages}
-              >
-                Next
-              </button>
-            </div>
-          </>)
-      }
+          </div>
+
+          <div className="pagination">
+
+            <button
+              onClick={() =>
+                setCurrentPage(currentPage - 1)
+              }
+              disabled={currentPage === 1}
+            >
+              Previous
+            </button>
+
+            <span>
+              Page {currentPage} of {totalPages}
+            </span>
+
+            <button
+              onClick={() =>
+                setCurrentPage(currentPage + 1)
+              }
+              disabled={
+                currentPage === totalPages
+              }
+            >
+              Next
+            </button>
+
+          </div>
+        </>
+      )}
 
       {activeSection === "products" && (
         <div className="productlist">
-          <h3>Products:</h3>
-          {role === "admin" && (<button onClick={() => { setShowProductForm(true) }}>Add Product</button>)}
-          {
-            showProductForm && (
-              <div>
-                <input placeholder="Product Name" value={newProduct} onChange={(e) => setNewProduct(e.target.value)} />
-                {
-                  role === "admin" && (
-                    <button onClick={handleAddProduct}>{editProductId ? "Update" : "Add"}</button>
-                  )
+
+          <h3>
+            Products:
+          </h3>
+
+          {role === "admin" && (
+            <button
+              onClick={() => {
+                setShowProductForm(true);
+              }}
+            >
+              Add Product
+            </button>
+          )}
+
+          {showProductForm && (
+            <div>
+
+              <input
+                placeholder="Product Name"
+                value={newProduct}
+                onChange={(e) =>
+                  setNewProduct(e.target.value)
                 }
+              />
+
+              {role === "admin" && (
                 <button
-                  onClick={() => {
-                    setShowProductForm(false);
-                    setEditProductId(null);
-                    setNewProduct("");
-                  }}
+                  onClick={handleAddProduct}
                 >
-                  Cancel
+                  {editProductId
+                    ? "Update"
+                    : "Add"}
                 </button>
-              </div>
-            )
-          }
-          {
-            products.map((product) => (
-              <div key={product.id}>
-                <p>{product.name}</p>
-                {role === "admin" && (<button onClick={() => handleEditProduct(product)}>Edit</button>)}
-                {role === "admin" && (<button onClick={() => handleDeleteProduct(product.id)}>Delete</button>)}
+              )}
 
+              <button
+                onClick={() => {
+                  setShowProductForm(false);
+                  setEditProductId(null);
+                  setNewProduct("");
+                }}
+              >
+                Cancel
+              </button>
 
-              </div>
-            ))
-          }
+            </div>
+          )}
+
+          {products.map((product) => (
+            <div key={product.id}>
+
+              <p>
+                {product.name}
+              </p>
+
+              {role === "admin" && (
+                <button
+                  onClick={() =>
+                    handleEditProduct(product)
+                  }
+                >
+                  Edit
+                </button>
+              )}
+
+              {role === "admin" && (
+                <button
+                  onClick={() =>
+                    handleDeleteProduct(product.id)
+                  }
+                >
+                  Delete
+                </button>
+              )}
+
+            </div>
+          ))}
+
         </div>
       )}
 
-      {
-        activeSection === "suppliers" && (
-          <div className="supplierlist">
-            <h3>Suppliers:</h3>
+      {activeSection === "suppliers" && (
+        <div className="supplierlist">
 
-            {role === "admin" && (<button onClick={() => setShowSupplierForm(true)}>
-              Add Supplier
-            </button>)}
+          <h3>
+            Suppliers:
+          </h3>
 
-            {showSupplierForm && (
-              <div>
-                <input
-                  placeholder="Supplier Name"
-                  value={newSupplier.name}
-                  onChange={(e) =>
-                    setNewSupplier({
-                      ...newSupplier,
-                      name: e.target.value
-                    })
-                  }
-                />
-
-                <input
-                  placeholder="Country"
-                  value={newSupplier.country}
-                  onChange={(e) =>
-                    setNewSupplier({
-                      ...newSupplier,
-                      country: e.target.value
-                    })
-                  }
-                />
-
-                <button onClick={handleAddSupplier}>
-                  {editSupplierId ? "Update" : "Add"}
-                </button>
-                <button
-                  onClick={() => {
-                    setShowSupplierForm(false);
-                    setEditSupplierId(null);
-                    setNewSupplier({
-                      name: "",
-                      country: ""
-                    });
-                  }}
-                >
-                  Cancel
-                </button>
-              </div>
-            )}
-
-            {suppliers.map((supplier) => (
-              <div key={supplier.id}>
-                <p>Name: {supplier.name}</p>
-                <p>Country: {supplier.country}</p>
-
-                {role === "admin" && (<button onClick={() => handleEditSupplier(supplier)}>
-                  Edit
-                </button>)}
-
-                {role === "admin" && (<button onClick={() => handleDeleteSupplier(supplier.id)}>
-                  Delete
-                </button>)}
-              </div>
-            ))}
-          </div>
-        )
-      }
-      {activeSection === "users" && role === "admin" && (
-        <div className="section">
-
-          <div className="section-header">
-            <h2>Users</h2>
-
+          {role === "admin" && (
             <button
-              onClick={() => setShowUserForm(!showUserForm)}
+              onClick={() =>
+                setShowSupplierForm(true)
+              }
             >
-              {showUserForm ? "Cancel" : "Add User"}
+              Add Supplier
             </button>
-          </div>
+          )}
 
-          {showUserForm && (
-            <form
-              onSubmit={handleAddUser}
-              className="form"
-            >
+          {showSupplierForm && (
+            <div>
 
               <input
-                type="text"
-                placeholder="Username"
-                value={newUser.username}
+                placeholder="Supplier Name"
+                value={newSupplier.name}
                 onChange={(e) =>
-                  setNewUser({
-                    ...newUser,
-                    username: e.target.value
+                  setNewSupplier({
+                    ...newSupplier,
+                    name: e.target.value
                   })
                 }
-                required
               />
 
               <input
-                type="password"
-                placeholder="Password"
-                value={newUser.password}
+                placeholder="Country"
+                value={newSupplier.country}
                 onChange={(e) =>
-                  setNewUser({
-                    ...newUser,
-                    password: e.target.value
+                  setNewSupplier({
+                    ...newSupplier,
+                    country: e.target.value
                   })
                 }
-                required
               />
 
-              <select
-                value={newUser.role}
-                onChange={(e) =>
-                  setNewUser({
-                    ...newUser,
-                    role: e.target.value,
-                    supplier_id: ""
-                  })
+              <button
+                onClick={handleAddSupplier}
+              >
+                {editSupplierId
+                  ? "Update"
+                  : "Add"}
+              </button>
+
+              <button
+                onClick={() => {
+                  setShowSupplierForm(false);
+                  setEditSupplierId(null);
+
+                  setNewSupplier({
+                    name: "",
+                    country: ""
+                  });
+                }}
+              >
+                Cancel
+              </button>
+
+            </div>
+          )}
+
+          {suppliers.map((supplier) => (
+            <div key={supplier.id}>
+
+              <p>
+                Name: {supplier.name}
+              </p>
+
+              <p>
+                Country: {supplier.country}
+              </p>
+
+              {role === "admin" && (
+                <button
+                  onClick={() =>
+                    handleEditSupplier(supplier)
+                  }
+                >
+                  Edit
+                </button>
+              )}
+
+              {role === "admin" && (
+                <button
+                  onClick={() =>
+                    handleDeleteSupplier(
+                      supplier.id
+                    )
+                  }
+                >
+                  Delete
+                </button>
+              )}
+
+            </div>
+          ))}
+
+        </div>
+      )}
+
+      {activeSection === "users" &&
+        role === "admin" && (
+          <div className="section">
+
+            <div className="section-header">
+
+              <h2>
+                Users
+              </h2>
+
+              <button
+                onClick={() =>
+                  setShowUserForm(!showUserForm)
                 }
               >
-                <option value="user">User</option>
-                <option value="supplier">Supplier</option>
-                <option value="admin">Admin</option>
-              </select>
+                {showUserForm
+                  ? "Cancel"
+                  : "Add User"}
+              </button>
 
-              {newUser.role === "supplier" && (
-                <select
-                  value={newUser.supplier_id}
+            </div>
+
+            {showUserForm && (
+              <form
+                onSubmit={handleAddUser}
+                className="form"
+              >
+
+                <input
+                  type="text"
+                  placeholder="Username"
+                  value={newUser.username}
                   onChange={(e) =>
                     setNewUser({
                       ...newUser,
-                      supplier_id: e.target.value
+                      username: e.target.value
                     })
                   }
                   required
+                />
+
+                <input
+                  type="password"
+                  placeholder="Password"
+                  value={newUser.password}
+                  onChange={(e) =>
+                    setNewUser({
+                      ...newUser,
+                      password: e.target.value
+                    })
+                  }
+                  required
+                />
+
+                <select
+                  value={newUser.role}
+                  onChange={(e) =>
+                    setNewUser({
+                      ...newUser,
+                      role: e.target.value,
+                      supplier_id: ""
+                    })
+                  }
                 >
-                  <option value="">
-                    Select Supplier
+                  <option value="user">
+                    User
                   </option>
 
-                  {suppliers.map((supplier) => (
-                    <option
-                      key={supplier.id}
-                      value={supplier.id}
-                    >
-                      {supplier.name}
-                    </option>
-                  ))}
+                  <option value="supplier">
+                    Supplier
+                  </option>
+
+                  <option value="admin">
+                    Admin
+                  </option>
                 </select>
-              )}
 
-              <button type="submit">
-                Create User
-              </button>
+                {newUser.role === "supplier" && (
+                  <select
+                    value={newUser.supplier_id}
+                    onChange={(e) =>
+                      setNewUser({
+                        ...newUser,
+                        supplier_id: e.target.value
+                      })
+                    }
+                    required
+                  >
+                    <option value="">
+                      Select Supplier
+                    </option>
 
-            </form>
-          )}
+                    {suppliers.map((supplier) => (
+                      <option
+                        key={supplier.id}
+                        value={supplier.id}
+                      >
+                        {supplier.name}
+                      </option>
+                    ))}
+                  </select>
+                )}
 
-          <div className="table-container">
+                <button type="submit">
+                  Create User
+                </button>
 
-            <table>
+              </form>
+            )}
 
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Username</th>
-                  <th>Role</th>
-                  <th>Supplier</th>
-                </tr>
-              </thead>
+            <div className="table-container">
 
-              <tbody>
+              <table>
 
-                {users.map((user) => (
-                  <tr key={user.id}>
+                <thead>
 
-                    <td>{user.id}</td>
-
-                    <td>{user.username}</td>
-
-                    <td>{user.role}</td>
-
-                    <td>
-                      {user.supplier || "-"}
-                    </td>
-
+                  <tr>
+                    <th>ID</th>
+                    <th>Username</th>
+                    <th>Role</th>
+                    <th>Supplier</th>
                   </tr>
-                ))}
 
-              </tbody>
+                </thead>
 
-            </table>
+                <tbody>
+
+                  {users.map((user) => (
+                    <tr key={user.id}>
+
+                      <td>
+                        {user.id}
+                      </td>
+
+                      <td>
+                        {user.username}
+                      </td>
+
+                      <td>
+                        {user.role}
+                      </td>
+
+                      <td>
+                        {user.supplier || "-"}
+                      </td>
+
+                    </tr>
+                  ))}
+
+                </tbody>
+
+              </table>
+
+            </div>
 
           </div>
+        )}
 
-        </div>
-      )}
     </div>
-
   );
 }
+
 export default App;
