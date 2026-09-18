@@ -663,8 +663,8 @@ function App() {
           <div className="login-card-right">
             <form onSubmit={handleLogin} className="login-form">
               <h2>Commodity Management System</h2>
-              <i>"User Name": Demo Admin01 <br />
-                "Password": demo@0987
+              <i>"User Name": Demo_Admin <br />
+                  "Password": demo@0987
               </i>
               <p>Sign in to your account</p>
               <input
